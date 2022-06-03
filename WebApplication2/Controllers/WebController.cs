@@ -27,7 +27,7 @@ namespace MathAPI.Controllers
         public List<Customer> Get()
         {
             SqlConnection cn = new SqlConnection();
-            cn.ConnectionString = @"Data Source=DESKTOP-R443NGM;Initial Catalog=Northwind;Integrated Security=true";
+            cn.ConnectionString = @"Data Source=(localdb)\mssqllocaldb;Initial Catalog=Northwind;Integrated Security=true";
 
             SqlCommand cmd = new SqlCommand("SELECT CustomerID FROM Customers");
             cmd.CommandType = System.Data.CommandType.Text;
@@ -52,7 +52,7 @@ namespace MathAPI.Controllers
         public List<Order> GetOrders(string CustomerId, int OrderId)
         {
             SqlConnection cn = new SqlConnection();
-            cn.ConnectionString = @"Data Source=DESKTOP-R443NGM;Initial Catalog=Northwind;Integrated Security=true";
+            cn.ConnectionString = @"Data Source=(localdb)\mssqllocaldb;Initial Catalog=Northwind;Integrated Security=true";
 
             SqlCommand cmd = new SqlCommand("SELECT o.CustomerID,o.OrderID FROM Customers c inner join Orders o on c.CustomerID=o.CustomerID inner join [Order Details] od on o.OrderID=od.OrderID where o.CustomerID='" + CustomerId + "' group by  o.CustomerID,o.OrderID");
             cmd.CommandType = System.Data.CommandType.Text;
@@ -76,10 +76,10 @@ namespace MathAPI.Controllers
 
         [HttpGet]
         [ActionName("GetTotalPrice")]
-        public List<TotalPrices> GetTotalPrice(string CustomerId, int OrderId)
+        public TotalPrices GetTotalPrice(string CustomerId, int OrderId)
         {
             SqlConnection cn = new SqlConnection();
-            cn.ConnectionString = @"Data Source=DESKTOP-R443NGM;Initial Catalog=Northwind;Integrated Security=true";
+            cn.ConnectionString = @"Data Source=(localdb)\mssqllocaldb;Initial Catalog=Northwind;Integrated Security=true";
 
             SqlCommand cmd = new SqlCommand("SELECT o.CustomerID,o.OrderID,Sum(od.Quantity*od.UnitPrice) FROM Customers c inner join Orders o on c.CustomerID=o.CustomerID inner join [Order Details] od on o.OrderID=od.OrderID where o.CustomerID='"+CustomerId+"' and o.OrderID = "+OrderId+" group by  o.CustomerID,o.OrderID");
             cmd.CommandType = System.Data.CommandType.Text;
@@ -87,18 +87,18 @@ namespace MathAPI.Controllers
             cn.Open();
             SqlDataReader dr = cmd.ExecuteReader();
 
-            List<TotalPrices> TotalPriceList = new List<TotalPrices>();
-
+            
+            TotalPrices TotalPrice = new TotalPrices();
             while (dr.Read())
             {
-                TotalPrices TotalPrice = new TotalPrices();
+                
                 TotalPrice.CustomerID = dr.GetString(0);
                 TotalPrice.OrderID = dr.GetInt32(1);
                 TotalPrice.TotalPrice = dr.GetDecimal(2);
-                TotalPriceList.Add(TotalPrice);
+                
             }
             cn.Close();
-            return TotalPriceList;
+            return TotalPrice;
         }
 
 
